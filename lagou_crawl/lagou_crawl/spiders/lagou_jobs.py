@@ -27,4 +27,5 @@ class LagouJobsSpider(scrapy.Spider):
             yield scrapy.Request(url=url, callback=self.parse, headers=self.headers)
 
     def parse(self, response):
+        
         pass
