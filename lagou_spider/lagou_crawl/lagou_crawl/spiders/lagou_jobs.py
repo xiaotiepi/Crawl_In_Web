@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import scrapy
-from lagou_crawl.items import LagouCrawlItem
+from lagou_spider.items import LagouCrawlItem
 
 
 class LagouJobsSpider(scrapy.Spider):

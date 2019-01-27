@@ -7,7 +7,7 @@
 
 from sqlalchemy.orm import sessionmaker
 from db import engine, JobModel
-from lagou_crawl.items import LagouCrawlItem
+from lagou_spider.items import LagouCrawlItem
 
 
 class LagouCrawlPipeline(object):
