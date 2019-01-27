@@ -1,5 +1,5 @@
 from sqlalchemy import Column, String, Integer
-from db.base import Base
+from db import Base
 
 
 class JobModel(Base):
@@ -15,5 +15,6 @@ class JobModel(Base):
     experience = Column(String(32))
     education = Column(String(16))
     tags = Column(String(256))
-    company = Column(String(32))
-    location = Column(String(256))
+    company = Column(String(64))
+    industry = Column(String(128))
+    scale = Column(String(64))

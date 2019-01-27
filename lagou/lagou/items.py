@@ -8,7 +8,7 @@
 import scrapy
 
 
-class LagouCrawlItem(scrapy.Item):
+class LagouItem(scrapy.Item):
     # define the fields for your item here like:
     # name = scrapy.Field()
     title = scrapy.Field()
@@ -18,4 +18,5 @@ class LagouCrawlItem(scrapy.Item):
     education = scrapy.Field()
     tags = scrapy.Field()
     company = scrapy.Field()
-    location = scrapy.Field()
+    industry = scrapy.Field()
+    scale = scrapy.Field()

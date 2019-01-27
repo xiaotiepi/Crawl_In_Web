@@ -7,19 +7,20 @@
 
 from sqlalchemy.orm import sessionmaker
 from db import engine, JobModel
-from lagou_spider.items import LagouCrawlItem
+from lagou.items import LagouItem
 
 
-class LagouCrawlPipeline(object):
+class LagouPipeline(object):
     def open_spider(self, spider):
-        self.session = sessionmaker(bind=engine)
+        Session = sessionmaker(bind=engine)
+        self.session = Session()
 
     def close_spider(self, spider):
         self.session.commit()
         self.session.close()
 
     def process_item(self, item, spider):
-        if isinstance(item, LagouCrawlItem):
+        if isinstance(item, LagouItem):
             return self._process_job_item(item)
         else:
             return item
@@ -30,8 +31,8 @@ class LagouCrawlPipeline(object):
         :param：LagouCrawlItem
         :return: item
         """
-        city = item['city'].split('.')[0]
-        tags = ''.join(item['tags'])
+        
+        city = item['city'].replace("·", "市")
 
         model = JobModel(
             title=item['title'],
@@ -40,8 +41,9 @@ class LagouCrawlPipeline(object):
             experience=item['experience'],
             education=item['education'],
             company=item['company'],
-            tags=tags,
-            location=item['location']
+            tags=item['tags'],
+            industry=item['industry'],
+            scale=item['scale']
         )
         self.session.add(model)
 

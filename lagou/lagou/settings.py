@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Scrapy settings for lagou_crawl project
+# Scrapy settings for lagou project
 #
 # For simplicity, this file contains only settings considered important or
 # commonly used. You can find more settings consulting the documentation:
@@ -9,17 +9,17 @@
 #     https://doc.scrapy.org/en/latest/topics/downloader-middleware.html
 #     https://doc.scrapy.org/en/latest/topics/spider-middleware.html
 
-BOT_NAME = 'lagou_crawl'
+BOT_NAME = 'lagou'
 
-SPIDER_MODULES = ['lagou_crawl.spiders']
-NEWSPIDER_MODULE = 'lagou_crawl.spiders'
+SPIDER_MODULES = ['lagou.spiders']
+NEWSPIDER_MODULE = 'lagou.spiders'
 
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
-#USER_AGENT = 'lagou_crawl (+http://www.yourdomain.com)'
+#USER_AGENT = 'lagou (+http://www.yourdomain.com)'
 
 # Obey robots.txt rules
-ROBOTSTXT_OBEY = True
+ROBOTSTXT_OBEY = False
 
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
 #CONCURRENT_REQUESTS = 32
@@ -47,13 +47,13 @@ ROBOTSTXT_OBEY = True
 # Enable or disable spider middlewares
 # See https://doc.scrapy.org/en/latest/topics/spider-middleware.html
 #SPIDER_MIDDLEWARES = {
-#    'lagou_crawl.middlewares.LagouCrawlSpiderMiddleware': 543,
+#    'lagou.middlewares.LagouSpiderMiddleware': 543,
 #}
 
 # Enable or disable downloader middlewares
 # See https://doc.scrapy.org/en/latest/topics/downloader-middleware.html
 #DOWNLOADER_MIDDLEWARES = {
-#    'lagou_crawl.middlewares.LagouCrawlDownloaderMiddleware': 543,
+#    'lagou.middlewares.LagouDownloaderMiddleware': 543,
 #}
 
 # Enable or disable extensions
@@ -64,9 +64,9 @@ ROBOTSTXT_OBEY = True
 
 # Configure item pipelines
 # See https://doc.scrapy.org/en/latest/topics/item-pipeline.html
-#ITEM_PIPELINES = {
-#    'lagou_crawl.pipelines.LagouCrawlPipeline': 300,
-#}
+ITEM_PIPELINES = {
+   'lagou.pipelines.LagouPipeline': 300,
+}
 
 # Enable and configure the AutoThrottle extension (disabled by default)
 # See https://doc.scrapy.org/en/latest/topics/autothrottle.html

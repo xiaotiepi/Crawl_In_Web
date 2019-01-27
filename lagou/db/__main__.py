@@ -1,4 +1,4 @@
-from lagou_spider.db.base import engine, Base
+from db.base import engine, Base
 """
 创建数据库表
 """
