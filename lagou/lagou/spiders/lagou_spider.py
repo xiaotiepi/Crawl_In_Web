@@ -21,7 +21,7 @@ class LagouSpiderSpider(scrapy.Spider):
 
     def start_requests(self):
         urls = [
-            'https://www.lagou.com/zhaopin/{}/'.format(i) for i in range(1, 31)
+            'https://www.lagou.com/zhaopin/Java/{}/'.format(i) for i in range(1, 31)
         ]
         for url in urls:
             yield scrapy.Request(url=url, callback=self.parse, headers=self.headers)
