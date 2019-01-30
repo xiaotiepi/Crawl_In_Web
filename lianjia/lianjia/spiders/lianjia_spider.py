@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import scrapy
 from lianjia.items import LianjiaItem
-import copy
 
 
 class LianjiaSpiderSpider(scrapy.Spider):
@@ -23,19 +22,26 @@ class LianjiaSpiderSpider(scrapy.Spider):
     }
 
     def start_requests(self):
+        """生成爬取链接，最大页数为100页
+        """
         urls = ['https://gz.lianjia.com/zufang/pg{}/'.format(i) for i in range(1, 4)]
         
         for url in urls:
             yield scrapy.Request(url=url, callback=self.parse, headers=self.headers)
 
     def parse(self, response):
+        """
+        解析租房列表页面
+        :param:response
+        :return:
+        """
         for house in response.xpath('//div[@class="content__list--item"]'):
             item = LianjiaItem()
             title = house.xpath('.//p[@class="content__list--item--title twoline"]/a/text()').re_first(r'\n(.*)').strip()
             # 户型
-            house_type = house.xpath('.//p[@class="content__list--item--des"]/text()').re(r'\n\s*(.*)\s*')[-1].strip()
+            house_type = house.xpath('.//p[@class="content__list--item--des"]/text()').re(r'\n\s*(\d*.*\S)\s')[-1]
             # 面积
-            area = house.xpath('.//p[@class="content__list--item--des"]/text()').re(r'\n\s*(.*)\s*')[-2].strip()
+            area = house.xpath('.//p[@class="content__list--item--des"]/text()').re(r'\n\s*(\d*.*\S)\s')[0]
             # 租金
             rent = house.xpath('.//span[@class="content__list--item-price"]/em/text()').extract_first()
             # 地址
@@ -44,38 +50,59 @@ class LianjiaSpiderSpider(scrapy.Spider):
             label = ",".join(house.xpath('.//p[@class="content__list--item--bottom oneline"]/i/text()').extract())
             # 楼层
             floor = "".join(house.xpath('.//span[@class="hide"]/text()').re(r'\n\s*(\S*)\s*(\S*)\s*'))
-            
-            item['title'] = title
-            item['house_type'] = "No datas" if house_type == "" else house_type
+            # 判断公寓
+            apartment = house.xpath('.//i[@class="content__item__tag--authorization_apartment"]/text()').extract_first()
+
+            item['apartment'] = apartment
             item['area'] = area
-            item['rent'] = rent + "元/月"
-            item['location'] = "No datas" if location == "" else location
+            item['house_type'] = house_type
+            item['title'] = title
+            item['rent'] = rent
+            item['location'] = location
             item['label'] = label
             item['floor'] = "No datas" if floor == "" else floor
 
-            # yield item
-            detail_url = response.urljoin(house.xpath('.//p[@class="content__list--item--title twoline"]/a/@href').extract_first())
-            requset = scrapy.Request(
-                detail_url, callback=self.detail_parse, meta={'item': item}, dont_filter=True, priority=10)
+            detail_url = response.urljoin(
+                house.xpath('.//p[@class="content__list--item--title twoline"]/a/@href').extract_first())
 
-    #         # detail_url = house.xpath('.//p[@class="content__list--item--title twoline"]/a/@href').extract_first()
-    #         # requset = response.follow(detail_url, callback=self.detail_parse, dont_filter=True)
+            """
+            注意：设置dont_filter=True,让生成的Request不参与URL去重，否则item无法传递到Detail_parse
+            否则item无法传递到detail_parse, 优先级priority=10,否则item未储存便退出
+            设置优先级priority=10,可以让生成的Request优先处理，数字越大优先级越高
+            页面追随的简写方式：
+            detail_url = house.xpath('.//p[@class="content__list--item--title twoline"]/a/@href').extract_first()
+            requset = response.follow(detail_url, callback=self.detail_parse, meta={'item': item},dont_filter=True, priority=10)
+            """
+            requset = scrapy.Request(
+                detail_url, callback=self.detail_parse, meta={'item': item}, dont_filter=True)
             yield requset
 
     def detail_parse(self, response):
+        """
+        解析租房的详情，接收parse的item，
+        增加更多的item，更新独栋公寓的item
+        :param: response
+        :return:
+        """
         item = response.meta['item']
-        print(item)
         # 房源发布时间
         release_time = "".join(response.xpath('//div[@class="content__subtitle"]/text()').re(r'(\d*-\d*-\d*)\s*'))
         # 租期
-        rent_period = "".join(response.xpath('//li[@class="fl oneline"][5]/text()').extract())
+        rent_period = "".join(response.xpath('//li[@class="fl oneline"][5]/text()').re(r'.*\:(.*)'))
         # 入住时间
         check_in = "".join(response.xpath('//li[@class="fl oneline"][3]/text()').extract())
         # 看房时间
         house_view_time = "".join(response.xpath('//li[@class="fl oneline"][6]/text()').extract())
 
+        if item['location'] == '':
+            item['location'] = response.xpath('//p[@class="flat__info--subtitle online"]/text()').re(r'\n\s*(\S*)')[0]
+        elif item['apartment'] == '独栋公寓':
+            item['label'] = response.xpath('//p/@data-desc').extract()
+        elif item['apartment'] is None:
+            item['apartment'] = '普通租房'
+
         item['release_time'] = release_time
-        item['rent_period'] = "No datas" if rent_period is None else rent_period
-        item['check_in'] = "No datas" if check_in is None else check_in
-        item['house_view_time'] = "No datas" if house_view_time is None else house_view_time
+        item['rent_period'] = "No datas" if rent_period == "" else rent_period
+        item['check_in'] = "No datas" if check_in == "" else check_in
+        item['house_view_time'] = "0000-00-00" if house_view_time is None else house_view_time
         yield item

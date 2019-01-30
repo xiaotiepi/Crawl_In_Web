@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, Integer, DateTime
+from sqlalchemy import Column, String, Integer
 from db import Base
 
 
@@ -9,6 +9,7 @@ class HouseModel(Base):
 
     id = Column(Integer, primary_key=True)
     title = Column(String(64))
+    apartment = Column(String(32))
     # 户型
     house_type = Column(String(64))
     # 面积
@@ -22,7 +23,7 @@ class HouseModel(Base):
     # 楼层
     floor = Column(String(16))
     # 房源发布时间
-    release_time = Column(DateTime)
+    release_time = Column(String(32))
     # 租期
     rent_period = Column(String(32))
     # 入住时间

@@ -8,7 +8,7 @@
 from sqlalchemy.orm import sessionmaker
 from db import engine, HouseModel
 from lianjia.items import LianjiaItem
-from datetime import datetime
+import re
 
 
 class LianjiaPipeline(object):
@@ -27,7 +27,14 @@ class LianjiaPipeline(object):
             return item
   
     def _process_house_item(self, item):
-        item['release_time'] = datetime.strptime(
-            item['release_time'], '%Y-%m-%d')
+        """
+        处理和储存链家爬虫的item
+        :param:item
+        :return:item
+        """
+        item['check_in'] = item['check_in'][3:]
+        item['house_view_time'] = item['house_view_time'][3:]
+        label = str(item['label'])
+        item['label'] = re.sub('(<br />)', '', label)
         self.session.add(HouseModel(**item))
         return item

@@ -22,3 +22,4 @@ class LianjiaItem(scrapy.Item):
     rent_period = scrapy.Field()
     check_in = scrapy.Field()
     house_view_time = scrapy.Field()
+    apartment = scrapy.Field()
