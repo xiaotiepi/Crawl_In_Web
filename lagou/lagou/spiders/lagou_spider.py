@@ -21,7 +21,7 @@ class LagouSpiderSpider(scrapy.Spider):
 
     def start_requests(self):
         urls = [
-            'https://www.lagou.com/zhaopin/Java/{}/'.format(i) for i in range(1, 31)
+            'https://www.lagou.com/zhaopin/Python/{}/'.format(i) for i in range(1, 31)
         ]
         for url in urls:
             yield scrapy.Request(url=url, callback=self.parse, headers=self.headers)
@@ -36,7 +36,7 @@ class LagouSpiderSpider(scrapy.Spider):
             tags = job.xpath('.//div[@class="li_b_r"]/text()').extract_first()
             industry, scale = job.xpath('.//div[@class="industry"]/text()').re(r'\n\s*(.*)/.*/\s*(.*)')
 
-            yield LagouItem({
+            item = LagouItem({
                 'title': title,
                 'city': city,
                 'salary_range': salary_range,
@@ -47,3 +47,5 @@ class LagouSpiderSpider(scrapy.Spider):
                 'industry': industry,
                 'scale': scale
             })
+            
+            yield item
