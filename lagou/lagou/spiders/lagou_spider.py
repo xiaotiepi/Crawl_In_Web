@@ -4,9 +4,9 @@ from lagou.items import LagouItem
 
 
 class LagouSpiderSpider(scrapy.Spider):
-    """
+    '''
     拉钩职位数据爬虫
-    """
+    '''
     name = 'lagou_spider'
     allowed_domains = ['lagou.com']
     headers = {
@@ -20,6 +20,9 @@ class LagouSpiderSpider(scrapy.Spider):
         }
 
     def start_requests(self):
+        '''
+        生成爬虫链接，最大30页
+        '''
         urls = [
             'https://www.lagou.com/zhaopin/Python/{}/'.format(i) for i in range(1, 31)
         ]
@@ -27,6 +30,9 @@ class LagouSpiderSpider(scrapy.Spider):
             yield scrapy.Request(url=url, callback=self.parse, headers=self.headers)
 
     def parse(self, response):
+        '''
+        解析页面,生成items
+        '''
         for job in response.xpath('//ul[@class="item_con_list"]/li'):
             title = job.xpath('.//div[@class="p_top"]/a/h3/text()').extract_first()
             city = job.xpath('.//span[@class="add"]/em/text()').extract_first()

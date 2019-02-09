@@ -21,11 +21,11 @@ class LagouPipeline(object):
 
     def process_item(self, item, spider):
         if isinstance(item, LagouItem):
-            return self._process_job_item(item)
+            return self.process_job_item(item)
         else:
             return item
 
-    def _process_job_item(self, item):
+    def process_job_item(self, item):
         """
         处理items用于保存到数据库
         :param：LagouCrawlItem
