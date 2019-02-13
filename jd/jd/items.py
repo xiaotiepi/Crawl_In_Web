@@ -21,7 +21,6 @@ class JdItem(scrapy.Item):
     comment_num = scrapy.Field()
     # 是否自营
     jd_support = scrapy.Field()
-    # 好评度
-    like_degree = scrapy.Field()
-    # 制造商
-    made_by = scrapy.Field()
+    # 链接
+    detail_url = scrapy.Field()
+

@@ -9,10 +9,23 @@ import pymongo
 
 
 class JdPipeline(object):
-    def __init__(self):
-        self.client = pymongo.MongoClient()
-        self.db = self.client['jd']
-        self.collection = self.db['keyboard']
+    '''
+    京东商品pipeline
+    将数据存入mongodb
+    '''
+    def __init__(self, settings):
+        self.mongo_uri = settings.get('MONGO_URI')
+        self.mongo_db = settings.get('MONGO_DB')
+        self.mongo_collection = settings.get('MONGO_COLLECTION')
+
+    @classmethod
+    def from_crawler(cls, crawler):
+        return cls(crawler.settings)
+
+    def open_spider(self, spider):
+        self.client = pymongo.MongoClient(self.mongo_uri)
+        self.db = self.client[self.mongo_db]
+        self.collection = self.db[self.mongo_collection]
 
     def process_item(self, item, spider):
         self.collection.insert(dict(item))
