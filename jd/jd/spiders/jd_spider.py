@@ -42,7 +42,7 @@ class JdSpiderSpider(scrapy.Spider):
                     jd_support = '自营'
                 else:
                     jd_support = '非自营'
-            except:
+            except Exception:
                 jd_support = '非自营'
                 
             item['name'] = name
