@@ -53,5 +53,4 @@ class LagouSpiderSpider(scrapy.Spider):
                 'industry': industry,
                 'scale': scale
             })
-            
             yield item

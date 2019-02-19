@@ -45,8 +45,8 @@ def run_spider(url):
                 break
             else:
                 next_page_btn.click()
-    except Exception:
-        print('爬取中断')
+    except Exception as e:
+        print('爬取中断:', str(e))
      
 
 def get_url(source):

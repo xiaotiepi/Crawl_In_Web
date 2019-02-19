@@ -80,6 +80,7 @@ DOWNLOAD_DELAY = 3
 DOWNLOADER_MIDDLEWARES = {
     'scrapy.downloadermiddleware.useragent.UserAgentMiddleware': None,
     'jd.middlewares.JdUseragentMiddleware': 400,
+    'jd.middlewares.JdProxyMiddleware': 401,
     'jd.middlewares.JdDownloaderMiddleware': 543,
 }
 
@@ -127,3 +128,5 @@ MONGO_URI = 'localhost'
 MONGO_DB = 'jd'
 
 MONGO_COLLECTION = 'jd_items'
+
+PROXY_URL = 'http://localhost:5555/random'

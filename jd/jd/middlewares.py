@@ -7,7 +7,8 @@
 
 import random
 import time
-from logging import getLogger
+import requests
+import logging
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -38,6 +39,37 @@ class JdUseragentMiddleware(object):
         return cls(crawler.settings)
 
 
+class JdProxyMiddleware(object):
+    '''
+    代理池中间件
+    使用时需要先打开代理池和redis服务器
+    '''
+    def __init__(self, settings):
+        self.logger = logging.getLogger(__name__)
+        self.proxy_url = settings.get('PROXY_URL')
+    
+    def get_random_proxy(self):
+        try:
+            response = requests.get(self.proxy_url)
+            if response.status_code == 200:
+                proxy = response.text
+                return proxy
+        except requests.ConnectionError:
+            return False
+    
+    def process_request(self, request, spider):
+        if request.meta.get('retry_times'):
+            proxy = self.get_random_proxy()
+            if proxy:
+                uri = 'https://{proxy}'.format(proxy=proxy)
+                self.logger.debug('使用代理 ' + proxy)
+                request.meta['proxy'] = uri
+
+    @classmethod
+    def from_crawler(cls, crawler):
+        return cls(crawler.settings)
+
+
 class JdDownloaderMiddleware(object):
     '''
     京东selenium对接scrapy中间件
@@ -45,7 +77,7 @@ class JdDownloaderMiddleware(object):
     防止页面还没加载出来就翻页
     '''
     def __init__(self, settings):
-        self.logger = getLogger(__name__)
+        self.logger = logging.getLogger(__name__)
         self.timeout = settings.get('SELENIUM_TIMEOUT')
         options = webdriver.ChromeOptions()
         # 设置中文
@@ -66,12 +98,6 @@ class JdDownloaderMiddleware(object):
         dispatcher.connect(self.spider_opened, signals.spider_opened)
         # spider关闭信号和spider_closed函数绑定
         dispatcher.connect(self.spider_closed, signals.spider_closed)
-
-    # 销毁内存时启用
-    # def __del__(self):
-    #     # print('关闭Chorme')
-    #     self.logger.debug('关闭Chorme浏览器')
-        # self.browser.close()
 
     @classmethod
     def from_crawler(cls, crawler):
@@ -117,5 +143,5 @@ class JdDownloaderMiddleware(object):
             return HtmlResponse(url=request.url, body=body, encoding='utf-8', request=request)
         
         except Exception as E:
-            print(str(E))
+            print('异常原因为：', str(E))
             return HtmlResponse(url=request.url, status=500, request=request)
